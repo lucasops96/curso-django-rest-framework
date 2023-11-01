@@ -4,12 +4,17 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from ..models import Recipe
-from ..serializers import RecipeSerializer
+from ..serializers import RecipeSerializer,TagSerializer
+from tag.models import Tag
 
 @api_view()
 def recipe_api_list(request):
     recipes = Recipe.objects.get_published()[:10]
-    serializer = RecipeSerializer(instance=recipes,many=True)
+    serializer = RecipeSerializer(
+        instance=recipes,
+        many=True,
+        context={'request':request}
+    )
     return Response(serializer.data)
 
 @api_view()
@@ -18,7 +23,11 @@ def recipe_api_detail(request,pk):
         Recipe.objects.get_published(),
         pk=pk
     ) 
-    serializer = RecipeSerializer(instance=recipe, many=False)
+    serializer = RecipeSerializer(
+        instance=recipe, 
+        many=False,
+        context={'request':request}
+    )
     return Response(serializer.data) 
 
     # recipe = Recipe.objects.get_published().filter(pk=pk).first()
@@ -29,3 +38,15 @@ def recipe_api_detail(request,pk):
     #     return Response({
     #         "detail":"Eita, nada encontrado"
     #     },status=status.HTTP_418_IM_A_TEAPOT)
+
+
+@api_view()
+def tag_api_detail(request,pk):
+    tag = get_object_or_404(
+        Tag.objects.all(),
+        pk=pk
+    )
+
+    serializer = TagSerializer(instance=tag,many=False)
+
+    return Response(serializer.data)

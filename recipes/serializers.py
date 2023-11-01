@@ -1,6 +1,7 @@
 # flake8: noqa
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from tag.models import Tag
 
 class CategorySerializer(serializers.Serializer):
     name = serializers.CharField(max_length=65)
@@ -29,6 +30,12 @@ class RecipeSerializer(serializers.Serializer):
 
     tags = TagSerializer(many=True)
     # tags = serializers.StringRelatedField(many=True)
+    tags_links = serializers.HyperlinkedRelatedField(
+        many=True,
+        source='tags',
+        queryset=Tag.objects.all(),
+        view_name='recipes:recipes_api_v2_tag'
+    )
 
     def any_method_name(self,obj):
         return f'{obj.preparation_time} {obj.preparation_time_unit}'
