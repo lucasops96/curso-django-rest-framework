@@ -22,11 +22,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = [
-            'id','title','description','public','preparation',
-            'category','author','tags','tags_objects','tags_links'
+            'id','title','description','author',
+            'category','tags','public','preparation',
+            'tags_objects','tags_links'
             ]
-        
-
 
     public = serializers.BooleanField(
         source='is_published',
@@ -62,3 +61,15 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def any_method_name(self,obj):
         return f'{obj.preparation_time} {obj.preparation_time_unit}'
+    
+    def validate(self, attrs):
+        print('Método validate',attrs)
+        return super().validate(attrs)
+    
+    def validate_title(self,value):
+        title = value
+
+        if len(title) < 5:
+            raise serializers.ValidationError('Must have at least 5 chars.')
+        
+        return title
