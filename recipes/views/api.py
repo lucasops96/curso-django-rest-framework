@@ -1,11 +1,14 @@
 # flake8: noqa
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from ..models import Recipe
-from ..serializers import RecipeSerializer,TagSerializer
+
 from tag.models import Tag
+
+from ..models import Recipe
+from ..serializers import RecipeSerializer, TagSerializer
+
 
 @api_view(http_method_names=['get','post'])
 def recipe_api_list(request):
@@ -23,9 +26,9 @@ def recipe_api_list(request):
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        # serializer.save()
+        serializer.save()
         return Response(
-            serializer.validated_data,
+            serializer.data,
             status=status.HTTP_201_CREATED
         )
 

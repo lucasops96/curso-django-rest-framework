@@ -1,6 +1,8 @@
 # flake8: noqa
 import os
+import string
 from collections import defaultdict
+from random import SystemRandom
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -12,6 +14,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
+
 from tag.models import Tag
 
 
@@ -87,8 +90,13 @@ class Recipe(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            slug = f'{slugify(self.title)}'
-            self.slug = slug
+            rand_letters = ''.join(
+                SystemRandom().choices(
+                    string.ascii_letters + string.digits,
+                    k=5,
+                )
+            )
+            self.slug = slugify(f'{self.title}-{rand_letters}')
 
         saved = super().save(*args, **kwargs)
 
