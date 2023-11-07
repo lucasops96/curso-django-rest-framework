@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from tag.models import Tag
 from .models import Recipe
+from collections import defaultdict
 
 class CategorySerializer(serializers.Serializer):
     name = serializers.CharField(max_length=65)
@@ -63,8 +64,20 @@ class RecipeSerializer(serializers.ModelSerializer):
         return f'{obj.preparation_time} {obj.preparation_time_unit}'
     
     def validate(self, attrs):
-        print('Método validate',attrs)
-        return super().validate(attrs)
+        super_validate = super().validate(attrs)
+
+        title = attrs.get('title')
+        description = attrs.get('description')
+
+        if title == description:
+            raise serializers.ValidationError(
+                {
+                    "title":["Posso","ter","mais de um erro"],
+                    "description":["Posso","ter","mais de um erro"],
+                }
+            )
+
+        return super_validate
     
     def validate_title(self,value):
         title = value
