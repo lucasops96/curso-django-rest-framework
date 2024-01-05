@@ -10,4 +10,6 @@ INSTALLED_APPS = [
     'recipes',
     'authors',
     'tag',
+
+    'rest_framework_simplejwt',
 ]
