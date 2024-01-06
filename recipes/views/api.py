@@ -8,11 +8,10 @@ from rest_framework.generics import ListCreateAPIView , RetrieveUpdateDestroyAPI
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
-from django.shortcuts import get_object_or_404
-from ..permissions import IsOwner
 from tag.models import Tag
+
 from ..models import Recipe
+from ..permissions import IsOwner
 from ..serializers import RecipeSerializer, TagSerializer
 
 class RecipeAPIv2Pagination(PageNumberPagination):
@@ -22,7 +21,7 @@ class RecipeAPIv2ViewSet(ModelViewSet):
     queryset = Recipe.objects.get_published()
     serializer_class = RecipeSerializer
     pagination_class = RecipeAPIv2Pagination
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, ]
 
     def get_serializer_class(self):
         return super().get_serializer_class()
@@ -60,13 +59,17 @@ class RecipeAPIv2ViewSet(ModelViewSet):
     
     def get_permissions(self):
         if self.request.method in ['PATCH','DELETE']:
-            return [IsOwner(),]
+            return [IsOwner(), ]
         
         return super().get_permissions()
 
-    def partial_update(self, request, *args, **kwargs):
-        pk = kwargs.get('pk')
+    def list(self, request, *args, **kwargs):
+        print('REQUEST',request.user)
+        print(request.user.is_authenticated)
 
+        return super().list(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
         recipe = self.get_object()
         serializer = RecipeSerializer(
             instance=recipe,
